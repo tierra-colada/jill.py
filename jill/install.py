@@ -13,6 +13,7 @@ import re
 import getpass
 import shutil
 import subprocess
+import ssl
 
 
 def default_depot_path():
@@ -304,7 +305,8 @@ def install_julia(version=None, *,
                   unstable=False,
                   keep_downloads=False,
                   confirm=False,
-                  reinstall=False):
+                  reinstall=False,
+                  bypass_ssl=False):
     """
     Install the Julia programming language for your current system
 
@@ -347,6 +349,8 @@ def install_julia(version=None, *,
         where you want julia packages installed.
       symlink_dir:
         where you want symlinks(e.g., `julia`, `julia-1`) placed.
+      bypass_ssl:
+        bypass ssl certifacate verification
     """
     install_dir = install_dir if install_dir else default_install_dir()
     install_dir = os.path.abspath(install_dir)
@@ -395,6 +399,9 @@ def install_julia(version=None, *,
     if not reinstall and is_installed(version):
         print(f"julia {version} already installed.")
         return True
+
+    if bypass_ssl:
+        ssl._create_default_https_context = ssl._create_unverified_context
 
     overwrite = True if version == "latest" else False
     print(f"{color.BOLD}----- Download Julia -----{color.END}")
