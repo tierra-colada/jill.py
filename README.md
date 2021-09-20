@@ -49,7 +49,7 @@ Note that `Python >= 3.6` is required. For base docker images, you also need to 
 
 Basic usage:
 
-`jill install [version] [--confirm] [--upstream UPSTREAM] [--unstable] [--reinstall] [--install_dir INSTALL_DIR] [--symlink_dir SYMLINK_DIR] [--bypass_ssl]`
+`jill install [version] [--confirm] [--upstream UPSTREAM] [--unstable] [--reinstall] [--install_dir INSTALL_DIR] [--symlink_dir SYMLINK_DIR] [--use_default_symlink_dir] [--bypass_ssl]`
 
 For the first-time users of `jill.py`, you may need to modify `PATH` accordingly so that your shell can find the executables when you type `julia`.
 
@@ -74,6 +74,8 @@ Valid `version` syntax:
 - `nightly`/`latest`: nightly builds
 
 The `bypass_ssl` flag allows you to bypass ssl verification during julia download.
+
+`use_default_symlink_dir` sets symlink to default dir only if `symlink_dir` is not set.
 
 At the time of writing, "1.6.1" and "1.7.0-beta1" are released, while "1.7.0" isn't yet.
 There are two ways to install an unstable release version `1.7.0-beta1`:

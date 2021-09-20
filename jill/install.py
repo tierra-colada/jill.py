@@ -221,7 +221,8 @@ def install_julia_linux(package_path,
         print(f"{color.GREEN}install Julia to {dest_path}{color.END}")
     os.chmod(dest_path, 0o755)  # issue 12
     bin_path = os.path.join(dest_path, "bin", "julia")
-    make_symlinks(bin_path, symlink_dir, version)
+    if symlink_dir:
+        make_symlinks(bin_path, symlink_dir, version)
     if upgrade:
         copy_root_project(version)
     return True
@@ -252,7 +253,8 @@ def install_julia_mac(package_path,
         print(f"{color.GREEN}install Julia to {dest_path}{color.END}")
     bin_path = os.path.join(dest_path,
                             "Contents", "Resources", "julia", "bin", "julia")
-    make_symlinks(bin_path, symlink_dir, version)
+    if symlink_dir:
+        make_symlinks(bin_path, symlink_dir, version)
     if upgrade:
         copy_root_project(version)
     return True
@@ -285,7 +287,8 @@ def install_julia_windows(package_path,
                                  f'/DIR={dest_path}'])
     print(f"{color.GREEN}install Julia to {dest_path}{color.END}")
     bin_path = os.path.join(dest_path, "bin", "julia.exe")
-    make_symlinks(bin_path, symlink_dir, version)
+    if symlink_dir:
+        make_symlinks(bin_path, symlink_dir, version)
     if upgrade:
         copy_root_project(version)
     return True
@@ -300,6 +303,7 @@ def hello_msg():
 def install_julia(version=None, *,
                   install_dir=None,
                   symlink_dir=None,
+                  use_default_symlink_dir=False,
                   upgrade=False,
                   upstream=None,
                   unstable=False,
@@ -349,13 +353,17 @@ def install_julia(version=None, *,
         where you want julia packages installed.
       symlink_dir:
         where you want symlinks(e.g., `julia`, `julia-1`) placed.
+      use_default_symlink_dir:
+        if you don't provide `symlink_dir` then `use_default_symlink_dir` sets symlink to
+        default dir.
       bypass_ssl:
         bypass ssl certifacate verification
     """
     install_dir = install_dir if install_dir else default_install_dir()
     install_dir = os.path.abspath(install_dir)
-    symlink_dir = symlink_dir if symlink_dir else default_symlink_dir()
-    symlink_dir = os.path.abspath(symlink_dir)
+    if use_default_symlink_dir and not symlink_dir:
+        symlink_dir = default_symlink_dir()
+        symlink_dir = os.path.abspath(symlink_dir)
     system, arch = current_system(), current_architecture()
     version = str(version) if (version or str(version) == "0") else ''
     version = "latest" if version == "nightly" else version
@@ -375,8 +383,9 @@ def install_julia(version=None, *,
         question = "jill will:\n"
         question += f"  1) install Julia {version_str} for {system}-{arch}"
         question += f" into {color.UNDERLINE}{install_dir}{color.END}\n"
-        question += f"  2) make symlinks in {color.UNDERLINE}{symlink_dir}{color.END}\n"
-        question += f"You may need to manually add {color.UNDERLINE}{symlink_dir}{color.END} to PATH\n"
+        if symlink_dir:
+            question += f"  2) make symlinks in {color.UNDERLINE}{symlink_dir}{color.END}\n"
+            question += f"You may need to manually add {color.UNDERLINE}{symlink_dir}{color.END} to PATH\n"
         question += "Continue installation?"
         to_continue = query_yes_no(question)
         if not to_continue:
